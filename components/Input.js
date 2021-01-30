@@ -3,7 +3,11 @@ import { StyleSheet, TextInput, View, } from 'react-native'
 
 const Input = (props) => {
     return(
-        <TextInput {...props} style={{...styles.input, ...props.style}} />
+        <TextInput 
+            {...props} 
+            style={{...styles.input, ...props.style}} 
+            textAlign="center" 
+        />
     )
 }
 

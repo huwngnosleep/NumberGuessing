@@ -3,7 +3,6 @@ import {
     StyleSheet,
     View, 
     Text, 
-    Button,
     TouchableWithoutFeedback,
     Keyboard, 
     Alert,
@@ -14,6 +13,7 @@ import Colors from '../constants/colors'
 import Card from '../components/Card'
 import Input from '../components/Input'
 import NumberContainer from '../components/NumberContainer'
+import MainButton from '../components/MainButton'
 
 const StartGameScreen = (props) => {
     const [input, setInput] = useState('')
@@ -62,21 +62,23 @@ const StartGameScreen = (props) => {
                     />
                     <View style={styles.buttonContainer}>
                         <View style={styles.button}>
-                            <Button onPress={resetButtonHandler} title="Reset" color={Colors.primary}/>
+                            <MainButton onPress={resetButtonHandler} style={styles.resetButton}>Reset</MainButton>
                         </View>
                         <View style={styles.button}>
-                            <Button onPress={confirmButtonHandler} title="Confirm" color={Colors.secondary}/>
+                            <MainButton onPress={confirmButtonHandler}>Confirm</MainButton>
                         </View>
                     </View>
                 </Card>
-                {confirmed ?
-                    <Card style={styles.summaryContainer}>
-                        <Text>Your number</Text>
-                        <NumberContainer>{chosenNumber}</NumberContainer>
-                        <Button title="Start game" onPress={() => props.onStartGame(chosenNumber)}/>
-                    </Card> 
-                     
-                : null}
+                {
+                    confirmed ?
+                        <Card style={styles.summaryContainer}>
+                            <Text>Your number</Text>
+                            <NumberContainer>{chosenNumber}</NumberContainer>
+                            <MainButton onPress={() => props.onStartGame(chosenNumber)}>Start game</MainButton>
+                        </Card> 
+                        
+                    : null
+                }
             </View>
         </TouchableWithoutFeedback>
     )
@@ -112,8 +114,11 @@ const styles = StyleSheet.create({
     button: {
         width: 100,
     },
+    resetButton: {
+        backgroundColor: Colors.secondary,
+    },
     summaryContainer: {
-        marginVertical: 20,
+        marginTop: 50,
         alignItems: 'center',
     },  
 })

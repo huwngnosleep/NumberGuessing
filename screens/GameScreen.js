@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect, } from 'react'
-import { StyleSheet, View, Text, Button, Alert, } from 'react-native'
+import { StyleSheet, View, Text, Alert, ScrollView, } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 
 import NumberContainer from '../components/NumberContainer'
 import Card from '../components/Card'
+import MainButton from '../components/MainButton'
 
 const randomNumberGenerator = (min, max, exclude) => {
     min = Math.ceil(min)
@@ -19,6 +21,7 @@ const randomNumberGenerator = (min, max, exclude) => {
 const GameScreen = (props) => {
     const [currentGuest, setCurrentGuest] = useState(randomNumberGenerator(1, 100, props.userChoice))
     const [guessCount, setGuessCount] = useState(0)
+    const [lastGuesses, setLastGuesses] = useState([currentGuest])
 
     const currentLow = useRef(1)
     const currentHigh = useRef(100)
@@ -43,22 +46,40 @@ const GameScreen = (props) => {
         if( direction === 'lower') {
             currentHigh.current = currentGuest
         } else {
-            currentLow.current = currentGuest
+            currentLow.current = currentGuest + 1
         }
 
         const nextGuess = randomNumberGenerator(currentLow.current, currentHigh.current, currentGuest)
         setCurrentGuest(nextGuess)
         setGuessCount(guessCount => guessCount + 1)
+        setLastGuesses(curLastGuesses => [ ...curLastGuesses, nextGuess])
     }
     
     return(
         <View style={styles.screen}>
-            <Text>Your Guess</Text>
+            <Text>Is it your number?</Text>
             <NumberContainer>{currentGuest}</NumberContainer>
             <Card style={styles.buttonContainer}>
-                <Button title="Lower" onPress={nextGuessHandler.bind(this,'lower')}/>
-                <Button title="Greater" onPress={nextGuessHandler.bind(this, 'greater')}/>
+                <MainButton onPress={nextGuessHandler.bind(this,'lower')}>
+                    <Ionicons name="md-remove" size={24} color="white" />
+                </MainButton>
+                <MainButton onPress={nextGuessHandler.bind(this, 'greater')}>
+                    <Ionicons name="md-add" size={24} color="white" />
+                </MainButton>
             </Card>
+            <View style={styles.listContainer}>
+                <ScrollView contentContainerStyle={styles.list}>
+                    {
+                        lastGuesses.map((item, index) => 
+                            <View key={item} style={styles.listItem}>
+                                <Text>#{index + 1}</Text>
+                                <Text>{item}</Text>
+                            </View>
+                        )
+                    } 
+                </ScrollView>
+            </View>
+            
         </View>
     )
 }
@@ -75,6 +96,21 @@ const styles = StyleSheet.create({
         marginTop: 20,
         width: 300,
         maxWidth: '80%',
+    },
+    listContainer: {
+        width: '80%',
+        flex: 1,
+    },
+    list: {
+        flexDirection: 'column-reverse',
+    },
+    listItem: {
+        borderBottomColor: 'black',
+        borderBottomWidth: 1,
+        padding: 15,
+        marginVertical: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
 })
 
