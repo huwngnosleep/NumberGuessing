@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { 
     StyleSheet,
     View, 
@@ -6,6 +6,9 @@ import {
     TouchableWithoutFeedback,
     Keyboard, 
     Alert,
+    Dimensions,
+    ScrollView,
+    KeyboardAvoidingView,
 } from 'react-native'
 
 import Colors from '../constants/colors'
@@ -19,7 +22,20 @@ const StartGameScreen = (props) => {
     const [input, setInput] = useState('')
     const [chosenNumber, setChosenNumber] = useState()
     const [confirmed, setConfirmed] = useState(false)
+    const [buttonWidth, setButtonWidth] = useState(deviceWidth / 4)
+
+    const updateLayout = () => {
+        setButtonWidth(Dimensions.get('window').width / 4)
+    }
+
+    useEffect(() => {
+        Dimensions.addEventListener('change', updateLayout)
+        return () => {
+            Dimensions.removeEventListener('change', updateLayout)
+        }
+    })
     
+
     const inputChangeHandler = (textInput) => {
         setInput(textInput.replace(/[^0-9]/g, ''))
     }
@@ -45,81 +61,88 @@ const StartGameScreen = (props) => {
     }
 
     return(
-        <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
-            <View style={styles.container}>
-                <Text style={styles.title}>Start a new game</Text>
-                <Card style={styles.inputContainer}>
-                    <Input 
-                        style={styles.input}
-                        placeholder="Enter a number"
-                        blurOnSubmit
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType="number-pad"
-                        maxLength={2}
-                        onChangeText={inputChangeHandler}
-                        value={input}
-                    />
-                    <View style={styles.buttonContainer}>
-                        <View style={styles.button}>
-                            <MainButton onPress={resetButtonHandler} style={styles.resetButton}>Reset</MainButton>
-                        </View>
-                        <View style={styles.button}>
-                            <MainButton onPress={confirmButtonHandler}>Confirm</MainButton>
-                        </View>
+        <ScrollView>
+            <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={30}>
+                <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
+                    <View style={styles.container}>
+                        <Text style={styles.title}>Start a new game</Text>
+                        <Card style={styles.inputContainer}>
+                            <Input 
+                                style={styles.input}
+                                placeholder="Enter a number"
+                                blurOnSubmit
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                keyboardType="number-pad"
+                                maxLength={2}
+                                onChangeText={inputChangeHandler}
+                                value={input}
+                            />
+                            <View style={styles.buttonContainer}>
+                                <View style={{...styles.button ,width: buttonWidth}}>
+                                    <MainButton onPress={resetButtonHandler} style={styles.resetButton}>Reset</MainButton>
+                                </View>
+                                <View style={{...styles.button ,width: buttonWidth}}>
+                                    <MainButton onPress={confirmButtonHandler}>Confirm</MainButton>
+                                </View>
+                            </View>
+                        </Card>
+                        {
+                            confirmed ?
+                                <Card style={styles.summaryContainer}>
+                                    <Text>Your number</Text>
+                                    <NumberContainer>{chosenNumber}</NumberContainer>
+                                    <MainButton onPress={() => props.onStartGame(chosenNumber)}>Start game</MainButton>
+                                </Card> 
+                                
+                            : null
+                        }
                     </View>
-                </Card>
-                {
-                    confirmed ?
-                        <Card style={styles.summaryContainer}>
-                            <Text>Your number</Text>
-                            <NumberContainer>{chosenNumber}</NumberContainer>
-                            <MainButton onPress={() => props.onStartGame(chosenNumber)}>Start game</MainButton>
-                        </Card> 
-                        
-                    : null
-                }
-            </View>
-        </TouchableWithoutFeedback>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
+        </ScrollView>
     )
 }
+
+const deviceHeight = Dimensions.get('window').height
+const deviceWidth = Dimensions.get('window').width
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        padding: 10,
-
+        marginBottom: deviceHeight > 600 ? 10 : 5
     },
     title: {
-        fontSize: 22,
-        paddingVertical: 10,
-        opacity: 0.8,
+        fontSize: deviceHeight > 600 ? 27 : 22,
+        marginVertical: deviceHeight / 23,
+        opacity: 0.7,
     },
     inputContainer: {
-        width: 300,
-        maxWidth: '80%',
+        width:'80%',
+        minWidth: 300,
         alignItems: 'center',
     },
     input: {
-        fontSize: 20,
+        fontSize: deviceHeight > 600 ? 25 : 20,
+        marginBottom: deviceHeight / 30,
     },
     buttonContainer: {
         flexDirection: 'row',
         width: '100%',
         justifyContent: 'space-around',
         alignItems: 'center',
-        paddingTop: 20,
+        marginBottom: deviceHeight / 40,
     },
     button: {
-        width: 100,
+        minWidth: 100,
     },
     resetButton: {
         backgroundColor: Colors.secondary,
     },
     summaryContainer: {
-        marginTop: 50,
         alignItems: 'center',
+        marginTop: deviceHeight / 20,
     },  
 })
 

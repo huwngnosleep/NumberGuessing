@@ -13,7 +13,7 @@ const Header = (props) => {
 const styles = StyleSheet.create({
     wrapper: {
         width: '100%',
-        paddingTop: 30,
+        marginTop: 30,
         justifyContent: 'center',
         alignItems: 'center',
     },
